@@ -1,0 +1,12 @@
+{
+  "name": "Sierra Leone Citizen Voice",
+  "short_name": "SL Voice",
+  "description": "Share challenges and recommendations for Sierra Leone's MDAs.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b3d2e",
+  "theme_color": "#0b3d2e",
+  "icons": [
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

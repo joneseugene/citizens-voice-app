@@ -1,6 +1,71 @@
 @import "tailwindcss";
 
+/* =========================
+   BASE DESIGN TOKENS
+========================= */
 :root {
-  --background: #f8faf7;
-  --foreground: #1f3d34;
+  --radius: 0.75rem;
+
+  /* Core */
+  --background: oklch(0.985 0.005 130);
+  --foreground: oklch(0.22 0.04 160);
+
+  /* Surface */
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.22 0.04 160);
+
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.22 0.04 160);
+
+  /* Brand */
+  --primary: oklch(0.45 0.13 155);
+  --primary-foreground: oklch(0.99 0.005 130);
+
+  --secondary: oklch(0.95 0.03 130);
+  --secondary-foreground: oklch(0.3 0.06 160);
+
+  --muted: oklch(0.95 0.015 140);
+  --muted-foreground: oklch(0.5 0.03 160);
+
+  --accent: oklch(0.72 0.18 55);
+  --accent-foreground: oklch(0.2 0.04 60);
+
+  --destructive: oklch(0.6 0.22 27);
+  --destructive-foreground: oklch(0.99 0.005 130);
+
+  /* UI */
+  --border: oklch(0.9 0.02 150);
+  --input: oklch(0.92 0.02 150);
+  --ring: oklch(0.45 0.13 155);
+
+  /* Charts */
+  --chart-1: oklch(0.55 0.16 155);
+  --chart-2: oklch(0.72 0.18 55);
+  --chart-3: oklch(0.6 0.15 240);
+  --chart-4: oklch(0.65 0.18 25);
+  --chart-5: oklch(0.5 0.12 290);
+
+  /* Sidebar */
+  --sidebar: oklch(0.985 0.005 130);
+  --sidebar-foreground: oklch(0.22 0.04 160);
+  --sidebar-primary: oklch(0.45 0.13 155);
+  --sidebar-primary-foreground: oklch(0.99 0.005 130);
+  --sidebar-accent: oklch(0.95 0.03 130);
+  --sidebar-accent-foreground: oklch(0.3 0.06 160);
+  --sidebar-border: oklch(0.9 0.02 150);
+  --sidebar-ring: oklch(0.45 0.13 155);
+}
+
+/* =========================
+  BASE STYLES
+========================= */
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  body {
+    background: var(--background);
+    color: var(--foreground);
+  }
 }
