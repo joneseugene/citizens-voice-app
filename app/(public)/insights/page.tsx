@@ -1,8 +1,12 @@
+import { InsightClient } from "@/components/page/insight.client";
+import { getInsightIssues } from "@/libs/api/insight.api";
 
-export default function Page() {
+export default async function InsightsPage() {
+  const issuesResponse = await getInsightIssues();
+
   return (
-    <div>
-        INSIGHT
-    </div>
+    <InsightClient
+      issues={issuesResponse.data}
+    />
   );
 }

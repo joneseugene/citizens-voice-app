@@ -10,6 +10,7 @@ type QueryOptions = {
   limit?: number;
   withCount?: boolean;
   searchFields?: string[];
+  search?: string;
 };
 
 type QueryResult<T> = {
@@ -19,25 +20,23 @@ type QueryResult<T> = {
 };
 
 export async function baseQuery<T = unknown>(
-  options: QueryOptions & {
-    search?: string;
-    ministry?: string;
-  },
+  options: QueryOptions,
 ): Promise<QueryResult<T>> {
   try {
     const supabase = await createServerSupabaseClient();
 
     const page = options.page ?? 1;
-    const limit = options.limit ?? 5;
+    const limit = options.limit ?? 10;
 
     const from = (page - 1) * limit;
     const to = from + limit - 1;
 
     let query = supabase
       .from(options.table)
-      .select(options.select || '*', { count: 'exact' });
+      .select(options.select || '*', {
+        count: options.withCount ? 'exact' : undefined,
+      });
 
-    // STANDARD FILTERS
     if (options.filters) {
       Object.entries(options.filters).forEach(([key, value]) => {
         if (value !== undefined && value !== null && value !== '') {
@@ -46,12 +45,10 @@ export async function baseQuery<T = unknown>(
       });
     }
 
-    // SEARCH
     if (
       options.search &&
       options.search.trim() !== '' &&
-      options.searchFields &&
-      options.searchFields.length > 0
+      options.searchFields?.length
     ) {
       const q = options.search.trim();
 
@@ -62,16 +59,12 @@ export async function baseQuery<T = unknown>(
       query = query.or(searchQuery);
     }
 
-    // ORDERING
-    if (options.orderBy === 'random') {
-      query = query.order('id', { ascending: false });
-    } else if (options.orderBy) {
+    if (options.orderBy && options.orderBy !== 'random') {
       query = query.order(options.orderBy, {
         ascending: options.ascending ?? true,
       });
     }
 
-    // PAGINATION (ALWAYS LAST)
     query = query.range(from, to);
 
     const { data, error, count } = await query;
@@ -83,13 +76,10 @@ export async function baseQuery<T = unknown>(
       total: count ?? 0,
     };
   } catch (err: unknown) {
-    const message =
-      err instanceof Error ? err.message : 'Network error occurred';
-
     return {
       data: [],
       total: 0,
-      error: message,
+      error: err instanceof Error ? err.message : 'Network error occurred',
     };
   }
 }

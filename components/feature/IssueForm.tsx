@@ -11,71 +11,72 @@ import {
   SelectValue,
 } from "@/components/ui/SelectInput";
 import { useDistricts } from "@/libs/hook/useDistrict";
-import { MdaInterface } from "@/libs/interface/mda.interface";
 import { RegionInterface } from "@/libs/interface/region.interface";
 import { citizen_schema } from "@/libs/schema/citizen.schema";
-import { Building2, Loader2, MapPin, PinIcon, Send } from "lucide-react";
+import { AlertTriangle, Building2, Loader2, MapPin, PinIcon, Send } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { createClient } from "@/supabase/client";
-import { model } from "@/supabase/model";
+import { IssueCategoryInterface } from "@/libs/interface/issue_category.interface";
+import { createIssue } from "@/libs/api/issues.api";
+import { capitalizeWords } from "@/utils/function";
 
-export const CitizenForm = ({
+export const IssueForm = ({
   regions,
-  mdas,
+  issue_categories,
   onDone,
 }: {
   regions: RegionInterface[];
-  mdas: MdaInterface[];
+  issue_categories: IssueCategoryInterface[];
   onDone: () => void;
 }) => {
   const [regionId, setRegionId] = useState("");
   const [districtId, setDistrictId] = useState("");
-  const [mdaId, setMdaId] = useState("");
+  const [categoryId, setCategoryId] = useState("");
   const [challenge, setChallenge] = useState("");
   const [recommendation, setRecommendation] = useState("");
+  const [severity, setSeverity] = useState<
+    "low" | "medium" | "high" | "critical"
+  >("medium");
   const [submitting, setSubmitting] = useState(false);
   const { districts, loading: loadingDistricts } = useDistricts(regionId);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+
     const parsed = citizen_schema.safeParse({
-      regionId,
-      districtId,
-      mdaId,
+      region_id: regionId,
+      district_id: districtId,
+      category_id: categoryId,
       challenge,
       recommendation,
+      severity,
+      submission_type: "anonymous",
     });
+
     if (!parsed.success) {
       toast.error(
         parsed.error.issues[0]?.message ?? "Please complete the form",
       );
+
       return;
     }
-
-    const payload = {
-      region_id: regionId,
-      district_id: districtId,
-      mda_id: mdaId,
-      challenge,
-      recommendation,
-    };
 
     setSubmitting(true);
 
-    const supabase = createClient();
+    const { error } = await createIssue(parsed.data);
 
-    const { error } = await supabase.from(model.submissions).insert(payload);
     setSubmitting(false);
 
     if (error) {
-      console.error(error);
-      toast.error("Could not submit. Try again.");
+      toast.error(error);
       return;
     }
+
     setChallenge("");
     setRecommendation("");
+
     onDone();
+
     toast.success("Thank you — your voice has been recorded.");
   }
 
@@ -88,7 +89,7 @@ export const CitizenForm = ({
         <div className="grid sm:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label className="flex items-center gap-1.5 text-(--foreground)">
-              <MapPin className="h-4 w-4 text-(--primary)" /> Region
+              Region
             </Label>
             <Select
               value={regionId}
@@ -104,7 +105,7 @@ export const CitizenForm = ({
               <SelectContent>
                 {regions.map((item) => (
                   <SelectItem key={item.id} value={item.id}>
-                    {item.name}
+                    {capitalizeWords(item.name)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -113,7 +114,7 @@ export const CitizenForm = ({
 
           <div className="space-y-2">
             <Label className="flex items-center gap-1.5 text-(--foreground)">
-              <PinIcon className="h-4 w-4 text-(--primary)" /> District
+              District
             </Label>
             <Select
               value={districtId}
@@ -135,31 +136,53 @@ export const CitizenForm = ({
               <SelectContent>
                 {districts.map((item) => (
                   <SelectItem key={item.id} value={item.id}>
-                    {item.name}
+                    {capitalizeWords(item.name)}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
-        </div>
 
-        <div className="space-y-2">
-          <Label className="flex items-center gap-1.5 text-(--foreground)">
-            <Building2 className="h-4 w-4 text-(--primary)" /> Ministry /
-            Department / Agency
-          </Label>
-          <Select value={mdaId} onValueChange={setMdaId}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select MDA" />
-            </SelectTrigger>
-            <SelectContent className="max-h-72">
-              {mdas.map((m) => (
-                <SelectItem key={m.id} value={m.id}>
-                  {m.name} - {m.acronym}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="space-y-2">
+            <Label className="flex items-center gap-1.5 text-(--foreground)">
+              Category
+            </Label>
+            <Select value={categoryId} onValueChange={setCategoryId}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select Category" />
+              </SelectTrigger>
+              <SelectContent className="max-h-72">
+                {issue_categories.map((item) => (
+                  <SelectItem key={item.id} value={item.id}>
+                    {capitalizeWords(item.name)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label className="flex items-center gap-1.5 text-(--foreground)">
+              Severity
+            </Label>
+            <Select
+              value={severity}
+              onValueChange={(value) =>
+                setSeverity(value as "low" | "medium" | "high" | "critical")
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select Severity" />
+              </SelectTrigger>
+
+              <SelectContent>
+                <SelectItem value="low">Low</SelectItem>
+                <SelectItem value="medium">Medium</SelectItem>
+                <SelectItem value="high">High</SelectItem>
+                <SelectItem value="critical">Critical</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         <FieldBox
@@ -168,7 +191,6 @@ export const CitizenForm = ({
           value={challenge}
           onChange={setChallenge}
           placeholder="e.g. Long queues at clinics"
-          tone="primary"
         />
 
         <FieldBox
@@ -177,7 +199,6 @@ export const CitizenForm = ({
           value={recommendation}
           onChange={setRecommendation}
           placeholder="e.g. Hire more nurses in rural areas"
-          tone="accent"
         />
 
         <Button

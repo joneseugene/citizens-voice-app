@@ -2,5 +2,5 @@ export const model = {
     regions: "regions",
     districts: "districts",
     mdas: "mdas",
-    submissions: "submissions"
+    issues: "issues"
 } as const;

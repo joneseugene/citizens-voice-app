@@ -2,19 +2,36 @@
 import { z } from "zod";
 
 export const citizen_schema = z.object({
-  regionId: z.string().min(1, "Choose a region"),
-  districtId: z.string().min(1, "Choose a district"),
-  mdaId: z.string().min(1, "Choose an MDA"),
+  region_id: z.string().uuid({
+    message: "Please select a region",
+  }),
+
+  district_id: z.string().uuid({
+    message: "Please select a district",
+  }),
+
+  category_id: z.string().uuid({
+    message: "Please select a category",
+  }),
+
   challenge: z
     .string()
     .trim()
-    .min(3, "Add a short challenge")
-    .max(100, "Max 100 characters"),
+    .min(10, "Challenge must be at least 10 characters")
+    .max(1000, "Challenge must not exceed 1000 characters"),
+
   recommendation: z
     .string()
     .trim()
-    .min(3, "Add a short recommendation")
-    .max(100, "Max 100 characters"),
+    .max(1000, "Recommendation must not exceed 1000 characters")
+    .optional()
+    .or(z.literal("")),
+
+  severity: z.enum(["low", "medium", "high", "critical"], {
+    message: "Please select severity",
+  }),
+
+  submission_type: z.enum(["anonymous", "verified"]).default("anonymous"),
 });
 
-export type CitizenSchema = z.infer<typeof citizen_schema>;
+export type CitizenFormData = z.infer<typeof citizen_schema>;

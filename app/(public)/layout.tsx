@@ -1,5 +1,5 @@
-import { Footer } from "@/components/layout/footer";
-import { Header } from "@/components/layout/header";
+import { PublicFooter } from "@/components/layout/public_footer";
+import { PublicHeader } from "@/components/layout/public_header";
 
 export default function RootLayout({
   children,
@@ -7,16 +7,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-        <div className="min-h-screen bg-(--background) text-(--foreground) flex flex-col">
-      <Header />
-      <main className="flex-1">
+    <div className="min-h-screen bg-background">
+      <PublicHeader />
+      <main>
         <section className="text-(--primary)">
-        <div className="mx-auto max-w-3xl px-4 py-10 sm:py-14">
-        {children}
-          </div>
-      </section>
-         </main>
-      <Footer />
+            {children}
+        </section>
+      </main>
+      <PublicFooter />
     </div>
   );
 }

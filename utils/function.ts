@@ -1,4 +1,4 @@
-import { STOPWORDS } from "./const";
+import { stopwords } from "./stop_words";
 
 // Tokenize
 export function tokenize(texts: string[]): Map<string, number> {
@@ -16,11 +16,41 @@ export function tokenize(texts: string[]): Map<string, number> {
       const word = raw.trim();
 
       if (word.length < 3) continue;
-      if (STOPWORDS.has(word)) continue;
+      if (stopwords.has(word)) continue;
 
       counts.set(word, (counts.get(word) ?? 0) + 1);
     }
   }
 
   return counts;
+}
+
+// Capitalize
+export function capitalizeWords(text?: string | null): string {
+  if (!text) return "";
+
+  return text
+    .toLowerCase()
+    .trim()
+    .split(/\s+/)
+    .map((word) =>
+      word
+        .split("-")
+        .map(
+          (part) =>
+            part.charAt(0).toUpperCase() + part.slice(1)
+        )
+        .join("-")
+    )
+    .join(" ");
+}
+
+// Format Day Labelling
+export function formatDayLabel(day: string) {
+  const date = new Date(day);
+
+  return date.toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+  });
 }
