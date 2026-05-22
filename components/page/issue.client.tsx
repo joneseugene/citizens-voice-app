@@ -2,7 +2,7 @@
 
 import { IssueCategoryInterface } from "@/libs/interface/issue_category.interface";
 import { RegionInterface } from "@/libs/interface/region.interface";
-import React, { useState } from "react";
+import { useState } from "react";
 import { Toaster } from "sonner";
 import { Done } from "../feature/DoneSubmit";
 import { IssueForm } from "../feature/IssueForm";
