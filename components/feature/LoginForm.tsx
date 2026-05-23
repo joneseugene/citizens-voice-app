@@ -1,6 +1,8 @@
 "use client";
 
+import { Home } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 type LoginRole = "chief_minister" | "admin";
 
@@ -19,6 +21,7 @@ export function LoginForm({
   onPasswordChange: (value: string) => void;
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
 }) {
+    const router = useRouter();
   return (
     <div className="w-full max-w-md rounded-2xl border bg-(--card) p-8 shadow-sm">
       <div className="flex justify-center items-center gap-2">
@@ -76,16 +79,25 @@ export function LoginForm({
         >
           {submitting ? "Signing in..." : "Continue"}
         </button>
-        <div className="flex items-center justify-center gap-2">
-          <Image
-            src="/image/dsti_logo.png"
-            alt="DSTI Logo"
-            width={28}
-            height={28}
-            className="h-7 w-auto"
-          />
+        {/* Footer */}
+        <div className="flex items-center">
+          {/* Left Home Icon */}
+          <Home  onClick={() => router.push("/")}  className="h-4 w-4 cursor-pointer text-(--muted-foreground)" /> 
 
-          <p className="text-center text-xs text-(--muted-foreground)">Developed by DSTI</p>
+          {/* Center DSTI Content */}
+          <div className="flex flex-1 items-center justify-center gap-2">
+            <Image
+              src="/image/dsti_logo.png"
+              alt="DSTI Logo"
+              width={28}
+              height={28}
+              className="h-7 w-auto"
+            />
+
+            <p className="text-xs text-(--muted-foreground)">
+              Developed by DSTI
+            </p>
+          </div>
         </div>
       </form>
     </div>
